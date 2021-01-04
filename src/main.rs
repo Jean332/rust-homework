@@ -1,7 +1,8 @@
-use std::io::prelude::*;//为了使用读写相关的trait
+//构建一个单线程web服务器，在地址127.0.0.1:8080上监听传入的tcp流，读取数据并打印出来；匹配和处理浏览器请求，对某个请求返回特定页面（hello.html),其余请求返回404页面
+use std::io::prelude::*;//使用标准库中读写相关的trait
 use std::net::TcpListener;//使用tcplistener监听tcp连接
 use std::net::TcpStream;
-use std::fs;
+use std::fs;//引入文件系统模块
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:8080");
@@ -13,7 +14,6 @@ fn main() {
     }
     println!("Connect established!");
 
-    
     let listener = listener.unwrap(); 
     println!("[server]:Waiting for next message...");
     for stream in listener.incoming() { //使用for循环+incoming函数依次处理每个连接，并生成一系列的流供处理
@@ -25,7 +25,7 @@ fn main() {
         let stream = stream.unwrap();//在任何错误情形下结束程序
         //println!("Connection estabilshed!");//tcp连接成功时提示连接成功
 
-        handle_connertion(stream);
+        handle_connertion(stream);//处理tcp流内的信息
     }
 }
 
@@ -47,11 +47,9 @@ fn handle_connertion(mut stream:TcpStream){//因为tcpstream的内部状态可�
 
         };
 
-
         let contents = fs::read_to_string(filename).unwrap();//把两个html文件放在项目根目录下
         let response = format!("{}{}",status_line,contents);
     
-
         stream.write(response.as_bytes()).unwrap();//将response的字符串转换成&[u8]字节，并送到连接中
         
     }
